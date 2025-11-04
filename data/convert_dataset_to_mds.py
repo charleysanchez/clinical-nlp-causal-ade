@@ -147,9 +147,9 @@ class ConcatTokensDataset(IterableDataset):
         # Process each sample individually.
         n_tokens = 0
         for sample in self.ds:
-            if not sample["notes"]:
+            if not sample["text"]:
                 continue
-            encoded = self.tokenizer(sample["notes"], truncation=False, padding=False, add_special_tokens=False)
+            encoded = self.tokenizer(sample["text"], truncation=False, padding=False, add_special_tokens=False)
             iids = encoded["input_ids"]
             # Create a fresh buffer for this sample.
             sample_buffer = list(iids)

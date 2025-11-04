@@ -1,0 +1,40 @@
+# @package _global_
+data_dir: ${oc.env:DATA_DIR,data/synth_clinical}
+out_dir: ./reports
+seed: 42
+
+# Files
+cohort_file: ${data_dir}/cohort.csv
+notes_file: ${data_dir}/notes.csv
+spans_file: ${data_dir}/spans_bio.csv
+
+
+# Columns
+treatment_col: T
+outcome_col: AKI
+outcome_secondary: mortality_in_hosp
+
+# Structured confounders used in X
+confounders: [age, sex, race, ckd, htn, dm2, charlson, sofa_admit, creatinine_baseline]
+
+# Toggle simple text features
+text_features:
+  use_ade_any: true
+  use_ade_negated: true
+
+# Encoding for categoricals
+encoding:
+  one_hot: [sex, race]
+  drop_first: true
+
+# Split policy
+split:
+  by: hadm_id
+  test_frac: 0.2
+  val_frac: 0.1
+
+# Logging
+log:
+  level: INFO
+  save_cfg_copy: true
+  

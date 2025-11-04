@@ -1,0 +1,18 @@
+# @package _global_
+defaults: [base]
+
+spans:
+  model_name: thomas-sounack/BioClinical-ModernBERT-base
+  labels: [DRUG, ADE]
+  max_len: 512
+  batch_size: 16
+  epochs: 3
+  lr: 5e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  gradient_accumulation_steps: 1
+  fp16: false
+
+  # Data split for spans training
+  train_frac: 0.8
+  seed: ${seed}

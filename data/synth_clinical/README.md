@@ -197,4 +197,29 @@ These map directly back to `notes.text[start:end]` and can be converted to BIO o
 
 <br>
 
+---
+
+## `convert_dataset_to_mds.py`
+
+Courtesy of [BioClinical-ModernBERT](https://github.com/lindvalllab/BioClinical-ModernBERT/blob/main/pretraining_resources/convert_dataset_to_mds.py). Behaves
+as filename would suggest. This is important as it follows previous papers' recommendations for increasing throughput of the model.
+
+To run,
+
+```bash
+python convert_dataset_to_mds.py \
+  --dataset synth_clinical/cohort.csv \
+  --row_count N \
+  --out_token_counts ../tokenized_datasets/synth_clinical/token_counts.txt \
+  --out_dir tokenized_datasets/synth_clinical/
+
+  python convert_dataset_to_mds.py \
+  --dataset synth_clinical/icustays.csv \
+  --row_count N \
+  --out_token_counts ../tokenized_datasets/synth_clinical/token_counts.txt \
+  --out_dir tokenized_datasets/synth_clinical/
+
+  ...
+  ```
+
 *This dataset is fully synthetic, contains no PHI, and is safe to publish.*
