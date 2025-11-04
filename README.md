@@ -7,3 +7,9 @@ The purpose of this repo is to build and end-to-end pipeline that:
   * (3) estimates causal effects of specific medications/exposures on outcomes (e.g., ICU readmission, in-hospital mortality) using doubly-robust and orthogonal ML estimators (DML/DR-Learner), with rigorous diagnostics (overlap, sensitivity, falsification tests)
 
 Results include an open, reproducible codebase, synthetic demo data, and a research paper.
+
+## Datasets and Access
+
+Primary text source: [MIMIC IV v3.1](https://physionet.org/content/mimiciv/3.1/)
+
+**Note**: To follow along, this dataset requires completing the CITI training *Data or Specimens Only Research*. Full details for how to do this are attainable through the link above.
