@@ -12,4 +12,10 @@ Results include an open, reproducible codebase, synthetic demo data, and a resea
 
 Primary text source: [MIMIC IV v3.1](https://physionet.org/content/mimiciv/3.1/)
 
-**Note**: To follow along, this dataset requires completing the CITI training *Data or Specimens Only Research*. Full details for how to do this are attainable through the link above.
+ 	Johnson, Alistair, et al. "MIMIC-IV" (version 3.1). PhysioNet (2024). RRID:SCR_007345. https://doi.org/10.13026/kpb9-mt58
+
+    Johnson, A.E.W., Bulgarelli, L., Shen, L. et al. MIMIC-IV, a freely accessible electronic health record dataset. Sci Data 10, 1 (2023). https://doi.org/10.1038/s41597-022-01899-x
+
+    Goldberger, A., Amaral, L., Glass, L., Hausdorff, J., Ivanov, P. C., Mark, R., ... & Stanley, H. E. (2000). PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals. Circulation [Online]. 101 (23), pp. e215–e220. RRID:SCR_007345.
+
+**Note**: To follow along, this dataset requires specific credentials and completing the CITI training *Data or Specimens Only Research*. Full details for how to do this are attainable through the link above.
