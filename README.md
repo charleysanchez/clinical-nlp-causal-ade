@@ -19,3 +19,25 @@ Primary text source: [MIMIC IV v3.1](https://physionet.org/content/mimiciv/3.1/)
     Goldberger, A., Amaral, L., Glass, L., Hausdorff, J., Ivanov, P. C., Mark, R., ... & Stanley, H. E. (2000). PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals. Circulation [Online]. 101 (23), pp. e215–e220. RRID:SCR_007345.
 
 **Note**: To follow along, this dataset requires specific credentials and completing the CITI training *Data or Specimens Only Research*. Full details for how to do this are attainable through the link above.
+
+# References
+
+@misc{sounack2025bioclinicalmodernbertstateoftheartlongcontext,
+      title={BioClinical ModernBERT: A State-of-the-Art Long-Context Encoder for Biomedical and Clinical NLP}, 
+      author={Thomas Sounack and Joshua Davis and Brigitte Durieux and Antoine Chaffin and Tom J. Pollard and Eric Lehman and Alistair E. W. Johnson and Matthew McDermott and Tristan Naumann and Charlotta Lindvall},
+      year={2025},
+      eprint={2506.10896},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2506.10896}, 
+}
+
+@misc{ling2023bioclinicalbertbertbase,
+      title={Bio+Clinical BERT, BERT Base, and CNN Performance Comparison for Predicting Drug-Review Satisfaction}, 
+      author={Yue Ling},
+      year={2023},
+      eprint={2308.03782},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2308.03782}, 
+}
