@@ -222,4 +222,18 @@ python convert_dataset_to_mds.py \
   ...
   ```
 
+  ## `create_synthetic_data.py`
+
+  Generator script to createthe synthetic data. This has been iterated on and
+  developed to create a synthetic dataset which sees a comparable difference in
+  performance using BioClinical ModernBERT vs vanilla ModernBERT. 
+
+  To run,
+
+  ```bash
+  python data/synth_clinical/create_synthetic_data.py
+  ```
+
+  from the base directory of the repo.
+
 *This dataset is fully synthetic, contains no PHI, and is safe to publish.*
