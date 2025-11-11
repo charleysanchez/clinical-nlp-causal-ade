@@ -1,0 +1,17 @@
+data_dir: data/synth_clinical
+dataset: synth
+n_samples: 8000
+pos_ratio: 0.5
+label_noise: 0.05
+tokenizer_max_len: 128
+model_names:
+  - thomas-sounack/BioClinical-ModernBERT-base
+  - answerdotai/ModernBERT-base
+train:
+  epochs: 4
+  batch: 32
+  lr: 1.0e-5
+  weight_decay: 0.10
+  label_smoothing: 0.10
+  eval_metric: eval_auprc
+  early_stopping_patience: 2

@@ -1,0 +1,6 @@
+{
+    "data_dir": "data/synth_clinical",
+    "n_samples": 8000,
+    "pos_ratio": 0.5,
+    "label_noise": 0.05
+}
