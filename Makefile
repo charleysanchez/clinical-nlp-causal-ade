@@ -14,7 +14,12 @@ eval:  ## aggregate metrics table
 	python scripts/summarize_results.py --runs_dir reports
 
 logits: ## export doc-level probabilities for causal pipeline
-	python scripts/export_logits.py --data_dir data/synth_clinical --model thomas-sounack/BioClinical-ModernBERT-base --out data/synth_clinical/doc_logits.csv
+	python -m scripts.export_logits --data_dir data/synth_clinical \
+		--run_dir reports/doc_cls_synth_thomas-sounack_BioClinical-ModernBERT-base \
+		--split all \
+		--max_len 128 \
+		--batch 64 \
+		--out data/synth_clinical/doc_logits.csv
 
 repro: env data train eval
 
