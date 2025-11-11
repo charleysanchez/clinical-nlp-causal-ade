@@ -23,6 +23,10 @@ logits: ## export doc-level probabilities for causal pipeline
 		--batch 64 \
 		--out data/synth_clinical/doc_logits.csv
 
+	python -m scripts.aggregate_logits \
+		--in_csv  data/synth_clinical/doc_logits.csv \
+		--out_csv data/synth_clinical/hadm_logits_features.csv
+
 repro: env data train eval
 
 lint:
