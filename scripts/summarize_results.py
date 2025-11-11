@@ -1,27 +1,55 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, json, re
+
+import argparse
+import json
+import re
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 import pandas as pd
+
+
 def parse_args():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs_dir", default="reports", help="Root directory to scan for metrics")
-    ap.add_argument("--pattern", default="**/metrics*.json", help="Glob pattern under runs_dir")
+    ap.add_argument(
+        "--runs_dir",
+        default="reports",
+        help="Root directory to scan for metrics",
+    )
+    ap.add_argument(
+        "--pattern",
+        default="**/metrics*.json",
+        help="Glob pattern under runs_dir",
+    )
     ap.add_argument("--out_csv", default="reports/summary.csv")
     ap.add_argument("--out_md", default="reports/summary.md")
-    ap.add_argument("--sort_by", default="eval_auprc", help="Metric to sort by (desc)")
-    ap.add_argument("--top_k", type=int, default=20, help="How many rows to show in printed preview")
-    ap.add_argument("--round", dest="round_digits", type=int, default=6, help="Rounding digits for floats")
+    ap.add_argument(
+        "--sort_by", default="eval_auprc", help="Metric to sort by (desc)"
+    )
+    ap.add_argument(
+        "--top_k",
+        type=int,
+        default=20,
+        help="How many rows to show in printed preview",
+    )
+    ap.add_argument(
+        "--round",
+        dest="round_digits",
+        type=int,
+        default=6,
+        help="Rounding digits for floats",
+    )
     return ap.parse_args()
+
 
 def _maybe_float(v):
     try:
         return float(v)
     except Exception:
         return v
-    
+
+
 def _flatten_compare_dict(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Handles compare-style file produced by train_compare.py:
@@ -56,7 +84,6 @@ def _infer_model_from_path(p: Path) -> str:
     return ""
 
 
-
 def _infer_dataset_from_name(p: Path) -> str:
     # Prefer metrics_<dataset>.json file name
     m = re.match(r"metrics_(.+)\.json$", p.name)
@@ -79,7 +106,9 @@ def load_metrics_file(p: Path) -> List[Dict[str, Any]]:
 
     rows: List[Dict[str, Any]] = []
     # Case 1: compare dict
-    if isinstance(payload, dict) and any(isinstance(v, dict) for v in payload.values()):
+    if isinstance(payload, dict) and any(
+        isinstance(v, dict) for v in payload.values()
+    ):
         rows = _flatten_compare_dict(payload)
     # Case 2: a single metrics dict
     elif isinstance(payload, dict):
@@ -99,7 +128,15 @@ def load_metrics_file(p: Path) -> List[Dict[str, Any]]:
         r = dict(r)  # copy
         # Standardize common keys if possible
         # Accept either 'eval_*' or plain keys
-        for k in ["eval_accuracy", "eval_f1", "eval_auroc", "eval_auprc", "eval_loss", "epoch", "seconds"]:
+        for k in [
+            "eval_accuracy",
+            "eval_f1",
+            "eval_auroc",
+            "eval_auprc",
+            "eval_loss",
+            "epoch",
+            "seconds",
+        ]:
             if k not in r:
                 plain = k.replace("eval_", "")
                 if plain in r:
@@ -113,7 +150,14 @@ def load_metrics_file(p: Path) -> List[Dict[str, Any]]:
 
         # Parse floats
         for k in list(r.keys()):
-            if k.startswith("eval_") or k in ("epoch", "seconds", "accuracy", "f1", "auroc", "auprc"):
+            if k.startswith("eval_") or k in (
+                "epoch",
+                "seconds",
+                "accuracy",
+                "f1",
+                "auroc",
+                "auprc",
+            ):
                 r[k] = _maybe_float(r[k])
 
         enriched.append(r)
@@ -146,13 +190,22 @@ def main():
 
     # Canonical column ordering
     preferred_cols = [
-        "dataset", "model_label", "model_name",
-        "eval_accuracy", "eval_f1", "eval_auroc", "eval_auprc",
-        "eval_loss", "epoch", "seconds",
-        "_source_file"
+        "dataset",
+        "model_label",
+        "model_name",
+        "eval_accuracy",
+        "eval_f1",
+        "eval_auroc",
+        "eval_auprc",
+        "eval_loss",
+        "epoch",
+        "seconds",
+        "_source_file",
     ]
     # Add any extra keys at the end
-    cols = [c for c in preferred_cols if c in df.columns] + [c for c in df.columns if c not in preferred_cols]
+    cols = [c for c in preferred_cols if c in df.columns] + [
+        c for c in df.columns if c not in preferred_cols
+    ]
     df = df[cols]
 
     # Rounding
@@ -162,7 +215,9 @@ def main():
     # Sorting
     sort_key = args.sort_by if args.sort_by in df.columns else "eval_auprc"
     ascending = False
-    df = df.sort_values(by=sort_key, ascending=ascending).reset_index(drop=True)
+    df = df.sort_values(by=sort_key, ascending=ascending).reset_index(
+        drop=True
+    )
 
     # Write outputs
     out_csv = Path(args.out_csv)
@@ -172,7 +227,21 @@ def main():
     out_md = Path(args.out_md)
     out_md.parent.mkdir(parents=True, exist_ok=True)
     # Small markdown table
-    md_cols = [c for c in ["dataset","model_label","model_name","eval_accuracy","eval_f1","eval_auroc","eval_auprc","eval_loss","seconds"] if c in df.columns]
+    md_cols = [
+        c
+        for c in [
+            "dataset",
+            "model_label",
+            "model_name",
+            "eval_accuracy",
+            "eval_f1",
+            "eval_auroc",
+            "eval_auprc",
+            "eval_loss",
+            "seconds",
+        ]
+        if c in df.columns
+    ]
     md = df[md_cols].to_markdown(index=False)
     out_md.write_text(md)
 

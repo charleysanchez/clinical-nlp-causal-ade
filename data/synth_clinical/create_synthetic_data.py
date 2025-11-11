@@ -1,7 +1,8 @@
+import argparse
 import json
 import random
-import argparse
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -10,23 +11,34 @@ random.seed(RNG_SEED)
 np.random.seed(RNG_SEED)
 
 ADE_SYNS = [
-    "acute kidney injury", "AKI", "renal injury", "worsening renal function",
-    "rise in creatinine", "acute renal impairment",
+    "acute kidney injury",
+    "AKI",
+    "renal injury",
+    "worsening renal function",
+    "rise in creatinine",
+    "acute renal impairment",
 ]
 CUE_TRAIN = [
-    "after starting {drug}", "following initiation of {drug}", "soon after {drug} was begun",
+    "after starting {drug}",
+    "following initiation of {drug}",
+    "soon after {drug} was begun",
 ]
 CUE_TEST = [
-    "temporal association with {drug}", "shortly post-initiation of {drug}",
+    "temporal association with {drug}",
+    "shortly post-initiation of {drug}",
     "in close proximity to {drug} start",
 ]
 POS_LINK = [
-    "patient developed {ade}", "clinical picture consistent with {ade}",
-    "lab trend indicates {ade}", "no alternative explanation for {ade}",
+    "patient developed {ade}",
+    "clinical picture consistent with {ade}",
+    "lab trend indicates {ade}",
+    "no alternative explanation for {ade}",
 ]
 NEG_LINK = [
-    "creatinine remained stable, not {ade}", "findings argue against {ade}",
-    "course not consistent with {ade}", "no evidence of {ade}",
+    "creatinine remained stable, not {ade}",
+    "findings argue against {ade}",
+    "course not consistent with {ade}",
+    "no evidence of {ade}",
 ]
 IMPLICIT = [
     "{ade} noted during treatment with {drug}.",
@@ -41,14 +53,22 @@ DISTRACT = [
 ]
 
 FILLER_SENTENCES = [
-    "Patient is alert and oriented.", "No acute events overnight.",
-    "Vitals monitored closely.", "Care plan discussed with team.",
-    "Symptoms reviewed with nursing staff.", "Labs reviewed and trended.",
+    "Patient is alert and oriented.",
+    "No acute events overnight.",
+    "Vitals monitored closely.",
+    "Care plan discussed with team.",
+    "Symptoms reviewed with nursing staff.",
+    "Labs reviewed and trended.",
 ]
 
 
-def _dref(drug): return drug if isinstance(drug, str) and drug else "ACE inhibitor therapy"
-def _pick(x): return random.choice(x)
+def _dref(drug):
+    return drug if isinstance(drug, str) and drug else "ACE inhibitor therapy"
+
+
+def _pick(x):
+    return random.choice(x)
+
 
 def _mask_all(s: str) -> str:
     for d in ["lisinopril", "enalapril", "ramipril"]:
@@ -57,21 +77,24 @@ def _mask_all(s: str) -> str:
         s = s.replace(a, "[ADE]").replace(a.upper(), "[ADE]")
     return s
 
+
 def _typo(s: str, p=0.03):
     out = []
     for w in s.split():
         if random.random() < p and len(w) > 4:
-            i = random.randrange(1, len(w)-1)
-            w = w[:i] + w[i+1:]  # drop char
+            i = random.randrange(1, len(w) - 1)
+            w = w[:i] + w[i + 1 :]  # drop char
         if random.random() < p and len(w) > 4:
-            i = random.randrange(1, len(w)-1)
-            w = w[:i] + w[i+1] + w[i] + w[i+2:]  # swap
+            i = random.randrange(1, len(w) - 1)
+            w = w[:i] + w[i + 1] + w[i] + w[i + 2 :]  # swap
         out.append(w)
     return " ".join(out)
+
 
 def _shuffle_sentences(sents):
     random.shuffle(sents)
     return " ".join(sents)
+
 
 def ensure_balanced_idx(n, pos_ratio=0.5):
     n_pos = int(n * pos_ratio)
@@ -80,13 +103,15 @@ def ensure_balanced_idx(n, pos_ratio=0.5):
     return y
 
 
-def make_note_text(base: str,
-                   drug: str,
-                   ade: str,
-                   split: str,
-                   is_positive: bool,
-                   implicit_bias_test: float,
-                   explicit_rate_train: float) -> str:
+def make_note_text(
+    base: str,
+    drug: str,
+    ade: str,
+    split: str,
+    is_positive: bool,
+    implicit_bias_test: float,
+    explicit_rate_train: float,
+) -> str:
     """
     Create a single note’s text with randomized cues + filler.
     - Test positives are implicit-only with probability ~implicit_bias_test.
@@ -132,7 +157,8 @@ def main(
     explicit_rate_train: float,
     seed: int,
 ):
-    random.seed(seed); np.random.seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
 
     data_dir = Path(data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -145,34 +171,55 @@ def main(
     if notes_csv.exists() and cohort_csv.exists():
         notes = pd.read_csv(notes_csv)
         cohort = pd.read_csv(cohort_csv)
-        merged = notes.merge(cohort[["hadm_id", "subject_id", "T", "AKI", "drug_name"]],
-                             on="hadm_id", how="left")
-        pool = merged[["subject_id", "hadm_id", "text", "T", "AKI", "drug_name"]].copy()
+        merged = notes.merge(
+            cohort[["hadm_id", "subject_id", "T", "AKI", "drug_name"]],
+            on="hadm_id",
+            how="left",
+        )
+        pool = merged[
+            ["subject_id", "hadm_id", "text", "T", "AKI", "drug_name"]
+        ].copy()
         if pool.empty:
-            raise RuntimeError("Found notes/cohort but merge is empty. Check keys.")
+            raise RuntimeError(
+                "Found notes/cohort but merge is empty. Check keys."
+            )
         while len(base_rows) < n_admissions:
-            r = pool.sample(1, replace=True, random_state=np.random.randint(10**9)).iloc[0]
-            base_rows.append({
-                "subject_id": r["subject_id"],
-                "hadm_id": r["hadm_id"],
-                "base_text": (r["text"] if isinstance(r["text"], str) else ""),
-                "T": int(r.get("T", 0)),
-                "AKI": int(r.get("AKI", 0)),
-                "drug_name": r.get("drug_name", ""),
-            })
+            r = pool.sample(
+                1, replace=True, random_state=np.random.randint(10**9)
+            ).iloc[0]
+            base_rows.append(
+                {
+                    "subject_id": r["subject_id"],
+                    "hadm_id": r["hadm_id"],
+                    "base_text": (
+                        r["text"] if isinstance(r["text"], str) else ""
+                    ),
+                    "T": int(r.get("T", 0)),
+                    "AKI": int(r.get("AKI", 0)),
+                    "drug_name": r.get("drug_name", ""),
+                }
+            )
     else:
         # Pure synthetic admissions
         for i in range(n_admissions):
-            subj = f"P{i % 10000:06d}"        # allow more subjects as we scale
+            subj = f"P{i % 10000:06d}"  # allow more subjects as we scale
             hadm = f"H{i:07d}"
             T = np.random.binomial(1, 0.5)
-            AKI = np.random.binomial(1, 0.4 + 0.2 * T)  # modest treatment-outcome link
+            AKI = np.random.binomial(
+                1, 0.4 + 0.2 * T
+            )  # modest treatment-outcome link
             base = _shuffle_sentences(random.sample(FILLER_SENTENCES, k=3))
             drug = _pick(["lisinopril", "enalapril", "ramipril"]) if T else ""
-            base_rows.append({
-                "subject_id": subj, "hadm_id": hadm, "base_text": base,
-                "T": T, "AKI": AKI, "drug_name": drug
-            })
+            base_rows.append(
+                {
+                    "subject_id": subj,
+                    "hadm_id": hadm,
+                    "base_text": base,
+                    "T": T,
+                    "AKI": AKI,
+                    "drug_name": drug,
+                }
+            )
 
     base_df = pd.DataFrame(base_rows)
 
@@ -201,9 +248,13 @@ def main(
         sig_note_idx = random.randrange(k_notes)
 
         for j in range(k_notes):
-            is_signal = (j == sig_note_idx)
+            is_signal = j == sig_note_idx
             # signal note follows the positive/negative construction; others are mostly filler-ish with weaker cues
-            is_positive = bool(r["target"]) if is_signal else bool(r["target"] and random.random() < 0.4)
+            is_positive = (
+                bool(r["target"])
+                if is_signal
+                else bool(r["target"] and random.random() < 0.4)
+            )
             text = make_note_text(
                 base=base,
                 drug=drug,
@@ -213,16 +264,20 @@ def main(
                 implicit_bias_test=implicit_bias_test,
                 explicit_rate_train=explicit_rate_train,
             )
-            rows.append({
-                "doc_id": f"D{doc_counter:09d}",
-                "subject_id": subj,
-                "hadm_id": r["hadm_id"],
-                "text": text,
-                "split": split,
-                "label": int(r["target"]),   # doc inherits admission target for supervision
-                "T": int(r["T"]),
-                "AKI": int(r["AKI"]),
-            })
+            rows.append(
+                {
+                    "doc_id": f"D{doc_counter:09d}",
+                    "subject_id": subj,
+                    "hadm_id": r["hadm_id"],
+                    "text": text,
+                    "split": split,
+                    "label": int(
+                        r["target"]
+                    ),  # doc inherits admission target for supervision
+                    "T": int(r["T"]),
+                    "AKI": int(r["AKI"]),
+                }
+            )
             doc_counter += 1
 
     df = pd.DataFrame(rows)
@@ -234,14 +289,21 @@ def main(
 
     # Ensure both classes present in both splits
     for sp in ["train", "test"]:
-        if df[df.split == sp]["label"].nunique() < 2 and len(df[df.split == sp]) > 0:
+        if (
+            df[df.split == sp]["label"].nunique() < 2
+            and len(df[df.split == sp]) > 0
+        ):
             j = df.index[df.split == sp][0]
             df.loc[j, "label"] = 1 - df.loc[j, "label"]
 
     # Save
     (data_dir / "notes.csv").write_text("")  # touch for Windows cache
-    df[["doc_id", "hadm_id", "subject_id", "text"]].to_csv(data_dir / "notes.csv", index=False)
-    df[["doc_id", "hadm_id", "subject_id", "split", "label", "T", "AKI"]].to_csv(data_dir / "doc_labels.csv", index=False)
+    df[["doc_id", "hadm_id", "subject_id", "text"]].to_csv(
+        data_dir / "notes.csv", index=False
+    )
+    df[
+        ["doc_id", "hadm_id", "subject_id", "split", "label", "T", "AKI"]
+    ].to_csv(data_dir / "doc_labels.csv", index=False)
 
     # VERSION / provenance
     version_path = data_dir / "VERSION"
@@ -260,15 +322,14 @@ def main(
     # Quick class balance print (admission-level intent → document-level labels)
     bal = (
         df.groupby(["split", "label"])
-          .size()
-          .groupby(level=0)
-          .apply(lambda x: (x / x.sum()).round(3))
+        .size()
+        .groupby(level=0)
+        .apply(lambda x: (x / x.sum()).round(3))
     )
     print("Saved at:", data_dir)
     print("Notes:", len(df))
     print("Admissions:", len(base_df))
     print("Class balance by split:\n", bal)
-
 
 
 if __name__ == "__main__":
@@ -283,4 +344,14 @@ if __name__ == "__main__":
     ap.add_argument("--explicit_rate_train", type=float, default=0.5)
     ap.add_argument("--seed", type=int, default=777)
     args = ap.parse_args()
-    main(args.data_dir, args.n_admissions, args.pos_ratio, args.label_noise, args.min_notes, args.max_notes, args.implicit_bias_test, args.explicit_rate_train, args.seed)
+    main(
+        args.data_dir,
+        args.n_admissions,
+        args.pos_ratio,
+        args.label_noise,
+        args.min_notes,
+        args.max_notes,
+        args.implicit_bias_test,
+        args.explicit_rate_train,
+        args.seed,
+    )
