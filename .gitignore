@@ -9,6 +9,9 @@ __pycache__/
 # Dataset
 data/mimic_iv
 
+# models
+reports/
+
 # Distribution / packaging
 .Python
 build/
