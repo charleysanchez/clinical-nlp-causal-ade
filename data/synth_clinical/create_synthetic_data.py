@@ -199,9 +199,9 @@ def main(
             df.loc[j, "label"] = 1 - df.loc[j, "label"]
 
     # Save
-    (data_dir/"notes_hard_v4.csv").write_text("")  # touch on Windows
-    df[["doc_id","hadm_id","subject_id","text"]].to_csv(data_dir/"notes_hard_v4.csv", index=False)
-    df[["doc_id","hadm_id","subject_id","split","label","T","AKI"]].to_csv(data_dir/"doc_labels_hard_v4.csv", index=False)
+    (data_dir/"notes.csv").write_text("")  # touch on Windows
+    df[["doc_id","hadm_id","subject_id","text"]].to_csv(data_dir/"notes.csv", index=False)
+    df[["doc_id","hadm_id","subject_id","split","label","T","AKI"]].to_csv(data_dir/"doc_labels.csv", index=False)
 
     # Quick class balance print
     bal = df.groupby(["split","label"]).size().groupby(level=0).apply(lambda x: (x/x.sum()).round(3))
