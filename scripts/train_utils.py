@@ -134,7 +134,7 @@ def run_model(
         warmup_ratio=0.10,
         fp16=fp16,
         max_grad_norm=1.0,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         eval_steps=50,
         save_strategy="steps",
         save_steps=50,

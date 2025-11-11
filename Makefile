@@ -8,7 +8,7 @@ data:  ## synth
 	python data/synth_clinical/create_synthetic_data.py --data_dir data/synth_clinical --n_samples 8000 --pos_ratio 0.5 --label_noise 0.05
 
 train: ## BioClinical + ModernBERT on synth (fixed split)
-	python scripts/train_compare.py --data_dir data/synth_clinical --max_len 128 --epochs 4 --batch 32 --lr 1e-5
+	python -m scripts.train_compare --config configs/experiment.synthetic.yaml --paths configs/paths.local.yaml
 
 eval:  ## aggregate metrics table
 	python scripts/summarize_results.py --runs_dir reports
