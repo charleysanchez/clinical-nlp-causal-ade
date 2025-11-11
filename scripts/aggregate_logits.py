@@ -23,3 +23,9 @@ agg = (
 Path(a.out_csv).parent.mkdir(parents=True, exist_ok=True)
 agg.to_csv(a.out_csv, index=False)
 print("Saved to:", a.out_csv)
+
+notes = pd.read_csv("data/synth_clinical/notes.csv")
+logits = pd.read_csv("data/synth_clinical/hadm_logits_features.csv")
+notes_aug = notes.merge(logits, on="hadm_id", how="left").fillna(0.0)
+notes_aug.to_csv("data/synth_clinical/notes_with_logits.csv", index=False)
+print("Merged logits and cohort. Saved to : data/synth_clinical/notes_with_logits.csv")
