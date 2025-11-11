@@ -4,8 +4,10 @@ env:
 	python -m venv .venv && source .venv/bin/activate && pip install -U pip wheel
 	pip install -r requirements.txt
 
-data:  ## synth
-	python data/synth_clinical/create_synthetic_data.py --data_dir data/synth_clinical --n_samples 8000 --pos_ratio 0.5 --label_noise 0.05
+data:
+	python data/synth_clinical/create_synthetic_data.py --data_dir data/synth_clinical \
+	 --n_admissions 10000 --pos_ratio 0.5 --label_noise 0.05 \
+	 --min_notes 2 --max_notes 6 --implicit_bias_test 0.8 --explicit_rate_train 0.5 --seed 1337
 
 train: ## BioClinical + ModernBERT on synth (fixed split)
 	python -m scripts.train_compare --config configs/experiment.synthetic.yaml --paths configs/paths.local.yaml
