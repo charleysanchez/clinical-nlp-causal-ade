@@ -9,6 +9,11 @@ data:
 	 --n_admissions 10000 --pos_ratio 0.5 --label_noise 0.05 \
 	 --min_notes 2 --max_notes 6 --implicit_bias_test 0.8 --explicit_rate_train 0.5 --seed 1337
 
+	 python scripts/build_cohort.py \
+		--in_labels data/synth_clinical/doc_labels.csv \
+		--out_cohort data/synth_clinical/cohort.csv
+
+
 train: ## BioClinical + ModernBERT on synth (fixed split)
 	python -m scripts.train_compare --config configs/experiment.synthetic.yaml --paths configs/paths.local.yaml
 
@@ -26,6 +31,12 @@ logits: ## export doc-level probabilities for causal pipeline
 	python -m scripts.aggregate_logits \
 		--in_csv  data/synth_clinical/doc_logits.csv \
 		--out_csv data/synth_clinical/hadm_logits_features.csv
+
+	python scripts/join_logits_to_cohort.py \
+		--cohort data/synth_clinical/cohort.csv \
+		--hadm_feats data/synth_clinical/hadm_logits_features.csv \
+		--out data/synth_clinical/cohort_with_logits.csv
+
 
 repro: env data train eval
 
