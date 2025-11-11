@@ -1,9 +1,11 @@
 import argparse
+import json
 from pathlib import Path
-import yaml, argparse, json
-import pandas as pd
+
+import yaml
 
 from scripts.train_utils import build_dataset, run_model
+
 
 def load_yaml(path):
     with open(path, "r") as f:
@@ -38,9 +40,13 @@ def main():
 
     results = {}
     for name, model_name in zip(["BioClinical", "ModernBERT"], models):
-        outdir = reports_root / f"doc_cls_{merged.get('dataset', 'synth')}_{model_name.replace('/','_')}"
+        outdir = (
+            reports_root
+            / f"doc_cls_{merged.get('dataset', 'synth')}_{model_name.replace('/', '_')}"
+        )
         metrics = run_model(
-            model_name, ds,
+            model_name,
+            ds,
             max_len=merged.get("tokenizer_max_len", 128),
             epochs=train_cfg.get("epochs", 4),
             batch=train_cfg.get("batch", 32),
