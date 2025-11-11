@@ -20,6 +20,15 @@ Primary text source: [MIMIC IV v3.1](https://physionet.org/content/mimiciv/3.1/)
 
 **Note**: To follow along, this dataset requires specific credentials and completing the CITI training *Data or Specimens Only Research*. Full details for how to do this are attainable through the link above.
 
+### (OPTIONAL) Reproduce on synthetic data (no MIMIC needed)
+```bash
+make repro
+# outputs:
+# - data/synth_clinical/notes_hard_v4.csv (and labels)
+# - reports/*/metrics.json (BioClinical + ModernBERT)
+# - tables/summary.csv
+
+
 # References
 
 @misc{sounack2025bioclinicalmodernbertstateoftheartlongcontext,
